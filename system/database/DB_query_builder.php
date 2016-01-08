@@ -256,6 +256,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	protected $qb_cache_no_escape			= array();
 
+	protected $small_cache		    = array();
+	protected $small_field		    = array();
 	// --------------------------------------------------------------------
 
 	/**
@@ -2786,4 +2788,55 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		));
 	}
 
+	public function find($table,$value,$key='id',$select='*')
+	{
+		return $this->query("SELECT $select FROM $table WHERE $key=? limit 1",$value)->row_array();
+	}
+	
+	/**
+	 * Set fields.
+	 *
+	 * @param	array	target field
+	 * @param	string	table
+	 * @return	void
+	 */
+	public function field($value=array(),$table=null){
+		if (is_null($table)) $this->small_field=$value;
+		else{
+			$this->load_cache($table);
+			$this->small_field=array_diff($this->small_cache[$table], $value);
+		}
+		return $this;
+	}
+	
+	public function load_cache($table){
+		if (!array_key_exists($table,$this->small_cache))
+			$this->small_cache[$table]=json_decode(file_get_contents(APPPATH.'Runtime/cache/'.$table.'.json'),TRUE);
+	}
+	
+	public function create($table=''){
+		$this->load_cache($table);
+		if (empty($this->small_field)){
+			$field=$this->small_cache[$table];//not set field,get all
+		}else{
+			$field=$this->small_field;
+			$this->small_field=array();
+		}
+		$res=array();
+		foreach ($field as $value) {
+			if (isset($_POST[$value]))
+				$res[$value]=$_POST[$value];
+		}
+		return $res;
+	}
+	
+	/**
+	 *  setInc and setDec
+	 *
+	 * @return	effected rows
+	 */
+	function step($table,$key,$isInc=TRUE,$num=1) {
+		$num=$isInc?"+$num":"-$num";
+		return $this->set($key,$key.$num,FALSE)->update($table);
+	}
 }

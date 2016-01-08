@@ -168,13 +168,14 @@ class CI_Input {
 	 * Fetch from array
 	 *
 	 * Internal method used to retrieve values from global arrays.
+	 * If index is array, return null while one of the index is null
 	 *
 	 * @param	array	&$array		$_GET, $_POST, $_COOKIE, $_SERVER, etc.
 	 * @param	mixed	$index		Index for item to be fetched from $array
 	 * @param	bool	$xss_clean	Whether to apply XSS filtering
 	 * @return	mixed
 	 */
-	protected function _fetch_from_array(&$array, $index = NULL, $xss_clean = NULL)
+	protected function _fetch_from_array(&$array, $index = NULL, $xss_clean = NULL,$default=NULL)
 	{
 		is_bool($xss_clean) OR $xss_clean = $this->_enable_xss;
 
@@ -188,6 +189,7 @@ class CI_Input {
 			foreach ($index as $key)
 			{
 				$output[$key] = $this->_fetch_from_array($array, $key, $xss_clean);
+				if (is_null($output[$key])) return NULL;
 			}
 
 			return $output;
@@ -197,7 +199,7 @@ class CI_Input {
 		{
 			$value = $array[$index];
 		}
-		elseif (($count = preg_match_all('/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches)) > 1) // Does the index contain array notation
+		/*elseif (($count = preg_match_all('/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches)) > 1) // Does the index contain array notation
 		{
 			$value = $array;
 			for ($i = 0; $i < $count; $i++)
@@ -217,10 +219,10 @@ class CI_Input {
 					return NULL;
 				}
 			}
-		}
+		}*/
 		else
 		{
-			return NULL;
+			return $default;
 		}
 
 		return ($xss_clean === TRUE)
@@ -237,9 +239,9 @@ class CI_Input {
 	 * @param	bool	$xss_clean	Whether to apply XSS filtering
 	 * @return	mixed
 	 */
-	public function get($index = NULL, $xss_clean = NULL)
+	public function get($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		return $this->_fetch_from_array($_GET, $index, $xss_clean);
+		return $this->_fetch_from_array($_GET, $index, $xss_clean,$default=NULL);
 	}
 
 	// --------------------------------------------------------------------
@@ -251,41 +253,9 @@ class CI_Input {
 	 * @param	bool	$xss_clean	Whether to apply XSS filtering
 	 * @return	mixed
 	 */
-	public function post($index = NULL, $xss_clean = NULL)
+	public function post($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		return $this->_fetch_from_array($_POST, $index, $xss_clean);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Fetch an item from POST data with fallback to GET
-	 *
-	 * @param	string	$index		Index for item to be fetched from $_POST or $_GET
-	 * @param	bool	$xss_clean	Whether to apply XSS filtering
-	 * @return	mixed
-	 */
-	public function post_get($index, $xss_clean = NULL)
-	{
-		return isset($_POST[$index])
-			? $this->post($index, $xss_clean)
-			: $this->get($index, $xss_clean);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Fetch an item from GET data with fallback to POST
-	 *
-	 * @param	string	$index		Index for item to be fetched from $_GET or $_POST
-	 * @param	bool	$xss_clean	Whether to apply XSS filtering
-	 * @return	mixed
-	 */
-	public function get_post($index, $xss_clean = NULL)
-	{
-		return isset($_GET[$index])
-			? $this->get($index, $xss_clean)
-			: $this->post($index, $xss_clean);
+		return $this->_fetch_from_array($_POST, $index, $xss_clean,$default=NULL);
 	}
 
 	// --------------------------------------------------------------------
