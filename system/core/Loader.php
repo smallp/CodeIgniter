@@ -486,7 +486,15 @@ class CI_Loader {
 	 */
 	public function view($view, $vars = array(), $return = FALSE)
 	{
-		return $this->_ci_load(array('_ci_view' => $view, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return));
+// 		return $this->_ci_load(array('_ci_view' => $view, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return));
+		$CI =& get_instance();
+		if (!isset($CI->smarty)){
+			require_once BASEPATH.'libraries/smarty/Smarty.php';
+			$CI->smarty=new Smarty();
+		}
+		if (!empty($vars))
+			$CI->smarty->assign($vars);
+		$CI->smarty->display($view.'.html');
 	}
 
 	// --------------------------------------------------------------------

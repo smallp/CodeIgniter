@@ -704,18 +704,15 @@ class Smarty extends Smarty_Internal_TemplateBase
             mb_internal_encoding(Smarty::$_CHARSET);
         }
         $this->start_time = microtime(true);
-
+        $this->setTemplateDir(APPPATH.'views/');
+        $this->setCompileDir(APPPATH.'Runtime/data/');
+        $this->setCacheDir(APPPATH.'Runtime/cache/');
         if (isset($_SERVER['SCRIPT_NAME'])) {
             Smarty::$global_tpl_vars['SCRIPT_NAME'] = new Smarty_Variable($_SERVER['SCRIPT_NAME']);
         }
 
         // Check if we're running on windows
         Smarty::$_IS_WINDOWS = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-
-        // let PCRE (preg_*) treat strings as ISO-8859-1 if we're not dealing with UTF-8
-        if (Smarty::$_CHARSET !== 'UTF-8') {
-            Smarty::$_UTF8_MODIFIER = '';
-        }
     }
 
     /**
