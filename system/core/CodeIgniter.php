@@ -76,57 +76,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 	require_once(BASEPATH.'core/Common.php');
 
-
-/*
- * ------------------------------------------------------
- * Security procedures
- * ------------------------------------------------------
- */
-
-if ( ! is_php('5.4'))
-{
-	ini_set('magic_quotes_runtime', 0);
-
-	if ((bool) ini_get('register_globals'))
-	{
-		$_protected = array(
-			'_SERVER',
-			'_GET',
-			'_POST',
-			'_FILES',
-			'_REQUEST',
-			'_SESSION',
-			'_ENV',
-			'_COOKIE',
-			'GLOBALS',
-			'HTTP_RAW_POST_DATA',
-			'system_path',
-			'application_folder',
-			'view_folder',
-			'_protected',
-			'_registered'
-		);
-
-		$_registered = ini_get('variables_order');
-		foreach (array('E' => '_ENV', 'G' => '_GET', 'P' => '_POST', 'C' => '_COOKIE', 'S' => '_SERVER') as $key => $superglobal)
-		{
-			if (strpos($_registered, $key) === FALSE)
-			{
-				continue;
-			}
-
-			foreach (array_keys($$superglobal) as $var)
-			{
-				if (isset($GLOBALS[$var]) && ! in_array($var, $_protected, TRUE))
-				{
-					$GLOBALS[$var] = NULL;
-				}
-			}
-		}
-	}
-}
-
-
 /*
  * ------------------------------------------------------
  *  Define a custom error handler so we can log PHP errors
@@ -159,29 +108,6 @@ if ( ! is_php('5.4'))
 
 /*
  * ------------------------------------------------------
- *  Should we use a Composer autoloader?
- * ------------------------------------------------------
- */
-	if ($composer_autoload = config_item('composer_autoload'))
-	{
-		if ($composer_autoload === TRUE)
-		{
-			file_exists(APPPATH.'vendor/autoload.php')
-				? require_once(APPPATH.'vendor/autoload.php')
-				: log_message('error', '$config[\'composer_autoload\'] is set to TRUE but '.APPPATH.'vendor/autoload.php was not found.');
-		}
-		elseif (file_exists($composer_autoload))
-		{
-			require_once($composer_autoload);
-		}
-		else
-		{
-			log_message('error', 'Could not find the specified $config[\'composer_autoload\'] path: '.$composer_autoload);
-		}
-	}
-
-/*
- * ------------------------------------------------------
  *  Start the timer... tick tock tick tock...
  * ------------------------------------------------------
  */
@@ -194,14 +120,14 @@ if ( ! is_php('5.4'))
  *  Instantiate the hooks class
  * ------------------------------------------------------
  */
-	$EXT =& load_class('Hooks', 'core');
+// 	$EXT =& load_class('Hooks', 'core');
 
 /*
  * ------------------------------------------------------
  *  Is there a "pre_system" hook?
  * ------------------------------------------------------
  */
-	$EXT->call_hook('pre_system');
+// 	$EXT->call_hook('pre_system');
 
 /*
  * ------------------------------------------------------
@@ -274,18 +200,6 @@ if ( ! is_php('5.4'))
 	{
 		ini_set('php.internal_encoding', $charset);
 	}
-
-/*
- * ------------------------------------------------------
- *  Load compatibility features
- * ------------------------------------------------------
- */
-
-	require_once(BASEPATH.'core/compat/mbstring.php');
-	require_once(BASEPATH.'core/compat/hash.php');
-	require_once(BASEPATH.'core/compat/password.php');
-	require_once(BASEPATH.'core/compat/standard.php');
-
 /*
  * ------------------------------------------------------
  *  Instantiate the UTF-8 class
@@ -319,10 +233,10 @@ if ( ! is_php('5.4'))
  *	Is there a valid cache file? If so, we're done...
  * ------------------------------------------------------
  */
-	if ($EXT->call_hook('cache_override') === FALSE && $OUT->_display_cache($CFG, $URI) === TRUE)
-	{
-		exit;
-	}
+// 	if ($EXT->call_hook('cache_override') === FALSE && $OUT->_display_cache($CFG, $URI) === TRUE)
+// 	{
+// 		exit;
+// 	}
 
 /*
  * -----------------------------------------------------
@@ -366,10 +280,10 @@ if ( ! is_php('5.4'))
 		return CI_Controller::get_instance();
 	}
 
-	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php'))
-	{
-		require_once APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php';
-	}
+// 	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php'))
+// 	{
+// 		require_once APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php';
+// 	}
 
 	// Set a mark point for benchmarking
 	$BM->mark('loading_time:_base_classes_end');
@@ -411,11 +325,11 @@ if ( ! is_php('5.4'))
 		{
 			$e404 = TRUE;
 		}
-		elseif (method_exists($class, '_remap'))
-		{
-			$params = array($method, array_slice($URI->rsegments, 2));
-			$method = '_remap';
-		}
+// 		elseif (method_exists($class, '_remap')) I do not need this
+// 		{
+// 			$params = array($method, array_slice($URI->rsegments, 2));
+// 			$method = '_remap';
+// 		}
 		// WARNING: It appears that there are issues with is_callable() even in PHP 5.2!
 		// Furthermore, there are bug reports and feature/change requests related to it
 		// that make it unreliable to use in this context. Please, DO NOT change this
@@ -487,7 +401,7 @@ if ( ! is_php('5.4'))
  *  Is there a "pre_controller" hook?
  * ------------------------------------------------------
  */
-	$EXT->call_hook('pre_controller');
+// 	$EXT->call_hook('pre_controller');
 
 /*
  * ------------------------------------------------------
@@ -504,7 +418,7 @@ if ( ! is_php('5.4'))
  *  Is there a "post_controller_constructor" hook?
  * ------------------------------------------------------
  */
-	$EXT->call_hook('post_controller_constructor');
+// 	$EXT->call_hook('post_controller_constructor');
 
 /*
  * ------------------------------------------------------
@@ -521,21 +435,21 @@ if ( ! is_php('5.4'))
  *  Is there a "post_controller" hook?
  * ------------------------------------------------------
  */
-	$EXT->call_hook('post_controller');
+// 	$EXT->call_hook('post_controller');
 
 /*
  * ------------------------------------------------------
  *  Send the final rendered output to the browser
  * ------------------------------------------------------
  */
-	if ($EXT->call_hook('display_override') === FALSE)
-	{
+// 	if ($EXT->call_hook('display_override') === FALSE)
+// 	{
 		$OUT->_display();
-	}
+// 	}
 
 /*
  * ------------------------------------------------------
  *  Is there a "post_system" hook?
  * ------------------------------------------------------
  */
-	$EXT->call_hook('post_system');
+// 	$EXT->call_hook('post_system');
