@@ -170,6 +170,25 @@ abstract class CI_DB_forge {
 		log_message('info', 'Database Forge Class Initialized');
 	}
 
+	function column_cache($name='')
+	{
+		if ($name==''){
+			$data=$this->db->query("SHOW TABLES")->result_array();
+			foreach ($data as $value) {
+				foreach ($value as $key => $table) {
+					$this->column_cache($table);
+				}
+			}
+		}else{
+			$data=$this->db->query("SHOW COLUMNS FROM `$name`")->result_array();
+			$res=array();
+			foreach ($data as $value) {
+				$res[]=$value['Field'];
+			}
+			file_put_contents(APPPATH.'Runtime/data/'.$name.'.json',json_encode($res));
+		}
+	}
+
 	// --------------------------------------------------------------------
 
 	/**
