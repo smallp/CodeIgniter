@@ -492,11 +492,6 @@ if ( ! function_exists('set_status_header'))
 	 */
 	function set_status_header($code = 200, $text = '')
 	{
-		if (is_cli())
-		{
-			return;
-		}
-
 		if (empty($code) OR ! is_numeric($code))
 		{
 			show_error('Status codes must be numeric', 500);
@@ -658,6 +653,9 @@ if ( ! function_exists('_exception_handler'))
 	 */
 	function _exception_handler($exception)
 	{
+		if (get_class($exception)=='MyException'){
+			return restful($exception->getCode(),$exception->getMessage());
+		}
 		$_error =& load_class('Exceptions', 'core');
 		$_error->log_exception('error', 'Exception: '.$exception->getMessage(), $exception->getFile(), $exception->getLine());
 
@@ -854,4 +852,19 @@ if ( ! function_exists('function_usable'))
 
 		return FALSE;
 	}
+}
+function restful($code=200,$data=NULL) {
+	set_status_header($code);
+	header('Content-Type:application/json; charset=utf-8');
+	if ($code<300){
+		echo is_null($data)?'':json_encode($data);
+	}else echo json_encode(['info'=>$data]);
+	exit();
+}
+class MyException extends Exception {
+	const ERR_AUTH=401;
+	const ERR_INPUT=402;
+	const ERR_NO_RIGHTS=405;
+	const ERR_GONE=410;
+	const ERR_DATABASE=500;
 }

@@ -459,7 +459,22 @@ class CI_Router {
 	 */
 	public function set_method($method)
 	{
-		$this->method = $method;
+		if ($this->config->item('restful')===TRUE){
+			switch ($_SERVER['REQUEST_METHOD']) {
+				case 'POST':
+				$this->method = 'add'.$method;
+				break;
+				case 'PUT':
+				$this->method = 'mod'.$method;
+				break;
+				case 'DELETE':
+				$this->method = 'del'.$method;
+				break;
+				default:
+				$this->method = $method;
+				break;
+			}
+		}else $this->method = $method;
 	}
 
 	// --------------------------------------------------------------------
