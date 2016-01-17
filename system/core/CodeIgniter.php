@@ -320,7 +320,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	else
 	{
 		require_once(APPPATH.'controllers/'.$RTR->directory.$class.'.php');
-
+		$class.='Controller';
 		if ( ! class_exists($class, FALSE) OR $method[0] === '_' OR method_exists('CI_Controller', $method))
 		{
 			$e404 = TRUE;
