@@ -111,9 +111,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *  Start the timer... tick tock tick tock...
  * ------------------------------------------------------
  */
-	$BM =& load_class('Benchmark', 'core');
-	$BM->mark('total_execution_time_start');
-	$BM->mark('loading_time:_base_classes_start');
+// 	$BM =& load_class('Benchmark', 'core');
+// 	$BM->mark('total_execution_time_start');
+// 	$BM->mark('loading_time:_base_classes_start');
 
 /*
  * ------------------------------------------------------
@@ -226,7 +226,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *  Instantiate the output class
  * ------------------------------------------------------
  */
-	$OUT =& load_class('Output', 'core');
+// 	$OUT =& load_class('Output', 'core');
 
 /*
  * ------------------------------------------------------
@@ -286,7 +286,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // 	}
 
 	// Set a mark point for benchmarking
-	$BM->mark('loading_time:_base_classes_end');
+// 	$BM->mark('loading_time:_base_classes_end');
 
 /*
  * ------------------------------------------------------
@@ -336,7 +336,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		// work-around until a better alternative is available.
 		elseif ( ! in_array(strtolower($method), array_map('strtolower', get_class_methods($class)), TRUE))
 		{
-			$e404 = TRUE;
+			/*if (file_exists(VIEWPATH.$class."/$method.html")){
+				$load=&load_class('Loader', 'core');
+				$load->view($class."/$method.html");
+				exit();
+			}else */$e404 = TRUE;
 		}
 	}
 
@@ -409,7 +413,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * ------------------------------------------------------
  */
 	// Mark a start point so we can benchmark the controller
-	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_start');
+// 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_start');
 
 	$CI = new $class();
 
@@ -428,7 +432,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	call_user_func_array(array(&$CI, $method), $params);
 
 	// Mark a benchmark end point
-	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_end');
+// 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_end');
 
 /*
  * ------------------------------------------------------
@@ -444,7 +448,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 // 	if ($EXT->call_hook('display_override') === FALSE)
 // 	{
-		$OUT->_display();
+// 		$OUT->_display();
 // 	}
 
 /*
