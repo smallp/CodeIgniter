@@ -151,7 +151,7 @@ class CI_Input {
 		}
 
 		// Sanitize global arrays
-		$this->_sanitize_globals();
+// 		$this->_sanitize_globals();
 
 		// CSRF Protection check
 		if ($this->_enable_csrf === TRUE && ! is_cli())
