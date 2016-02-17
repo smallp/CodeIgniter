@@ -649,7 +649,7 @@ if ( ! function_exists('_exception_handler'))
 	function _exception_handler($exception)
 	{
 		if (get_class($exception)=='MyException'){
-			return restful($exception->getCode(),$exception->getMessage());
+			return restful($exception->getCode(),$exception->info());
 		}
 		$_error =& load_class('Exceptions', 'core');
 		$_error->log_exception('error', 'Exception: '.$exception->getMessage(), $exception->getFile(), $exception->getLine());
@@ -847,18 +847,47 @@ if ( ! function_exists('function_usable'))
 		return FALSE;
 	}
 }
-function restful($code=200,$data=NULL) {
+function restful($code=204,$data=[]) {
 	set_status_header($code);
 	header('Content-Type:application/json; charset=utf-8');
 	if ($code<300){
-		echo is_null($data)?'':json_encode($data);
+		echo json_encode(is_string($data)?['info'=>$data]:$data);
 	}else echo json_encode(['info'=>$data]);
 	exit();
 }
 class MyException extends Exception {
-	const ERR_AUTH=401;
-	const ERR_INPUT=402;
-	const ERR_NO_RIGHTS=405;
-	const ERR_GONE=410;
-	const ERR_DATABASE=500;
+	const INPUT_ERR=400;
+	const AUTH=401;
+	const INPUT_MISS=402;
+	const NO_RIGHTS=403;
+	const CONFLICT=409;
+	const GONE=410;
+	const THIRD=502;
+	const DATABASE=503;
+	function info() {
+		if ($this->message!='') return $this->message;
+		switch ($this->code) {
+			case self::INPUT_ERR:
+			return '请求参数有误';
+			break;
+			case self::AUTH:
+			return '身份验证失败，请先登陆！';
+			break;
+			case self::INPUT_MISS:
+			return '请求参数缺失';
+			break;
+			case self::NO_RIGHTS:
+			return '没有权限';
+			break;
+			case self::GONE:
+			return '此条数据不存在';
+			break;
+			case self::DATABASE:
+			return '服务器繁忙';
+			break;
+			default:
+			return '';
+			break;
+		};
+	}
 }

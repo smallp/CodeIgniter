@@ -372,7 +372,7 @@ class CI_Router {
 		// Turn the segment array into a URI string
 		$uri = implode('/', $this->uri->segments);
 
-		// Get HTTP verb
+		/*/ Get HTTP verb
 		$http_verb = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'cli';
 
 		// Loop through the route array looking for wildcards
@@ -416,7 +416,7 @@ class CI_Router {
 				$this->_set_request(explode('/', $val));
 				return;
 			}
-		}
+		}*/
 
 		// If we got this far it means we didn't encounter a
 		// matching route so we'll set the site default route
