@@ -56,13 +56,6 @@ class CI_Log {
 	protected $_log_path;
 
 	/**
-	 * File permissions
-	 *
-	 * @var	int
-	 */
-	protected $_file_permissions = 0644;
-
-	/**
 	 * Level of logging
 	 *
 	 * @var int
@@ -126,7 +119,7 @@ class CI_Log {
 
 		$this->_log_path = ($config['log_path'] !== '') ? $config['log_path'] : APPPATH.'logs/';
 		$this->_file_ext = (isset($config['log_file_extension']) && $config['log_file_extension'] !== '')
-			? ltrim($config['log_file_extension'], '.') : 'php';
+			? ltrim($config['log_file_extension'], '.') : 'log';
 
 		file_exists($this->_log_path) OR mkdir($this->_log_path, 0755, TRUE);
 
@@ -148,11 +141,6 @@ class CI_Log {
 		if ( ! empty($config['log_date_format']))
 		{
 			$this->_date_fmt = $config['log_date_format'];
-		}
-
-		if ( ! empty($config['log_file_permissions']) && is_int($config['log_file_permissions']))
-		{
-			$this->_file_permissions = $config['log_file_permissions'];
 		}
 	}
 
@@ -183,24 +171,6 @@ class CI_Log {
 		}
 
 		$filepath = $this->_log_path.'log-'.date('Y-m-d').'.'.$this->_file_ext;
-		$message = '';
-
-		if ( ! file_exists($filepath))
-		{
-			$newfile = TRUE;
-			// Only add protection to php files
-			if ($this->_file_ext === 'php')
-			{
-				$message .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
-			}
-		}
-
-		if ( ! $fp = @fopen($filepath, 'ab'))
-		{
-			return FALSE;
-		}
-
-		flock($fp, LOCK_EX);
 
 		// Instantiating DateTime with microseconds appended to initial date is needed for proper support of this format
 		if (strpos($this->_date_fmt, 'u') !== FALSE)
@@ -215,82 +185,9 @@ class CI_Log {
 			$date = date($this->_date_fmt);
 		}
 
-		$message .= $this->_format_line($level, $date, $msg);
+		$message .= $level.' - '.$date.' --> '.$msg."\n";
 
-		for ($written = 0, $length = self::strlen($message); $written < $length; $written += $result)
-		{
-			if (($result = fwrite($fp, self::substr($message, $written))) === FALSE)
-			{
-				break;
-			}
-		}
-
-		flock($fp, LOCK_UN);
-		fclose($fp);
-
-		if (isset($newfile) && $newfile === TRUE)
-		{
-			chmod($filepath, $this->_file_permissions);
-		}
-
-		return is_int($result);
+		return error_log($message,3,$filepath);;
 	}
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * Format the log line.
-	 *
-	 * This is for extensibility of log formatting
-	 * If you want to change the log format, extend the CI_Log class and override this method
-	 *
-	 * @param	string	$level 	The error level
-	 * @param	string	$date 	Formatted date string
-	 * @param	string	$message 	The log message
-	 * @return	string	Formatted log line with a new line character '\n' at the end
-	 */
-	protected function _format_line($level, $date, $message)
-	{
-		return $level.' - '.$date.' --> '.$message."\n";
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Byte-safe strlen()
-	 *
-	 * @param	string	$str
-	 * @return	int
-	 */
-	protected static function strlen($str)
-	{
-		return (self::$func_override)
-			? mb_strlen($str, '8bit')
-			: strlen($str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Byte-safe substr()
-	 *
-	 * @param	string	$str
-	 * @param	int	$start
-	 * @param	int	$length
-	 * @return	string
-	 */
-	protected static function substr($str, $start, $length = NULL)
-	{
-		if (self::$func_override)
-		{
-			// mb_substr($str, $start, null, '8bit') returns an empty
-			// string on PHP 5.3
-			isset($length) OR $length = ($start >= 0 ? self::strlen($str) - $start : -$start);
-			return mb_substr($str, $start, $length, '8bit');
-		}
-
-		return isset($length)
-			? substr($str, $start, $length)
-			: substr($str, $start);
-	}
 }
