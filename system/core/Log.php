@@ -56,13 +56,6 @@ class CI_Log {
 	protected $_log_path;
 
 	/**
-	 * File permissions
-	 *
-	 * @var	int
-	 */
-	protected $_file_permissions = 0644;
-
-	/**
 	 * Level of logging
 	 *
 	 * @var int
@@ -117,7 +110,7 @@ class CI_Log {
 
 		$this->_log_path = ($config['log_path'] !== '') ? $config['log_path'] : APPPATH.'logs/';
 		$this->_file_ext = (isset($config['log_file_extension']) && $config['log_file_extension'] !== '')
-			? ltrim($config['log_file_extension'], '.') : 'php';
+			? ltrim($config['log_file_extension'], '.') : 'log';
 
 		file_exists($this->_log_path) OR mkdir($this->_log_path, 0755, TRUE);
 
@@ -139,11 +132,6 @@ class CI_Log {
 		if ( ! empty($config['log_date_format']))
 		{
 			$this->_date_fmt = $config['log_date_format'];
-		}
-
-		if ( ! empty($config['log_file_permissions']) && is_int($config['log_file_permissions']))
-		{
-			$this->_file_permissions = $config['log_file_permissions'];
 		}
 	}
 
@@ -174,22 +162,6 @@ class CI_Log {
 		}
 
 		$filepath = $this->_log_path.'log-'.date('Y-m-d').'.'.$this->_file_ext;
-		$message = '';
-
-		if ( ! file_exists($filepath))
-		{
-			$newfile = TRUE;
-			// Only add protection to php files
-			if ($this->_file_ext === 'php')
-			{
-				$message .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
-			}
-		}
-
-		if ( ! $fp = @fopen($filepath, 'ab'))
-		{
-			return FALSE;
-		}
 
 		// Instantiating DateTime with microseconds appended to initial date is needed for proper support of this format
 		if (strpos($this->_date_fmt, 'u') !== FALSE)
@@ -206,25 +178,7 @@ class CI_Log {
 
 		$message .= $level.' - '.$date.' --> '.$msg."\n";
 
-		flock($fp, LOCK_EX);
-
-		for ($written = 0, $length = strlen($message); $written < $length; $written += $result)
-		{
-			if (($result = fwrite($fp, substr($message, $written))) === FALSE)
-			{
-				break;
-			}
-		}
-
-		flock($fp, LOCK_UN);
-		fclose($fp);
-
-		if (isset($newfile) && $newfile === TRUE)
-		{
-			chmod($filepath, $this->_file_permissions);
-		}
-
-		return is_int($result);
+		return error_log($message,3,$filepath);;
 	}
 
 }

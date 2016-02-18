@@ -697,7 +697,7 @@ abstract class CI_DB_driver {
 
 			return FALSE;
 		}
-
+		log_message('debug', 'Query : '.$sql);
 		// Stop and aggregate the query time results
 		$time_end = microtime(TRUE);
 		$this->benchmark += $time_end - $time_start;

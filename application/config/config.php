@@ -223,7 +223,7 @@ $config['directory_trigger'] = 'd';
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 2;
 
 /*
 |--------------------------------------------------------------------------
@@ -241,26 +241,11 @@ $config['log_path'] = '';
 | Log File Extension
 |--------------------------------------------------------------------------
 |
-| The default filename extension for log files. The default 'php' allows for
-| protecting the log files via basic scripting, when they are to be stored
-| under a publicly accessible directory.
-|
-| Note: Leaving it blank will default to 'php'.
+| The default filename extension for log files. 
+| Note: Leaving it blank will default to 'log'.
 |
 */
-$config['log_file_extension'] = '';
-
-/*
-|--------------------------------------------------------------------------
-| Log File Permissions
-|--------------------------------------------------------------------------
-|
-| The file system permissions to be applied on newly created log files.
-|
-| IMPORTANT: This MUST be an integer (no quotes) and you MUST use octal
-|            integer notation (i.e. 0700, 0644, etc.)
-*/
-$config['log_file_permissions'] = 0644;
+$config['log_file_extension'] = 'log';
 
 /*
 |--------------------------------------------------------------------------
