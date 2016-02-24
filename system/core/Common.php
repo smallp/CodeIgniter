@@ -847,13 +847,16 @@ if ( ! function_exists('function_usable'))
 		return FALSE;
 	}
 }
-function restful($code=204,$data=[]) {
+function restful($code=204,$data='操作成功！') {
 	set_status_header($code);
 	header('Content-Type:application/json; charset=utf-8');
-	if ($code<300){
-		echo json_encode(is_string($data)?['info'=>$data]:$data);
-	}else echo json_encode(['info'=>$data]);
+	echo json_encode(is_string($data)?['info'=>$data]:$data);
 	exit();
+}
+function getToken() {
+	if (isset($_SERVER['HTTP_TOKEN'])){
+		return ['token'=>$_SERVER['HTTP_TOKEN'],'id'=>$_SERVER['HTTP_UID']];
+	}else  return ['id'=>0,'token'=>''];
 }
 class MyException extends Exception {
 	const INPUT_ERR=400;
