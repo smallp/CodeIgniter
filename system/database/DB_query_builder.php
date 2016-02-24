@@ -2825,7 +2825,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$res=array();
 		foreach ($field as $value) {
 			if (isset($_POST[$value]))
-				$res[$value]=$_POST[$value];
+				$res[$value]=$this->security->xss_clean($_POST[$value]);
 		}
 		return $res;
 	}
