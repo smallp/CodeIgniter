@@ -176,9 +176,7 @@ class CI_Log {
 			$date = date($this->_date_fmt);
 		}
 
-		$message .= $level.' - '.$date.' --> '.$msg."\n";
-
-		return error_log($message,3,$filepath);;
+		return error_log($level.' - '.$date.' --> '.$msg."\n",3,$filepath);
 	}
 
 }
