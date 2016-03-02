@@ -241,7 +241,7 @@ class CI_Input {
 	 */
 	public function get($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		return $this->_fetch_from_array($_GET, $index, $xss_clean,$default=NULL);
+		return $this->_fetch_from_array($_GET, $index, $xss_clean,$default);
 	}
 
 	// --------------------------------------------------------------------
@@ -255,7 +255,13 @@ class CI_Input {
 	 */
 	public function post($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		return $this->_fetch_from_array($_POST, $index, $xss_clean,$default=NULL);
+		return $this->_fetch_from_array($_POST, $index, $xss_clean,$default);
+	}
+	
+	public function put($index = NULL, $xss_clean = NULL,$default=NULL)
+	{
+		parse_str(file_get_contents('php://input'),$data);
+		return $this->_fetch_from_array($data, $index, $xss_clean,$default);
 	}
 
 	// --------------------------------------------------------------------

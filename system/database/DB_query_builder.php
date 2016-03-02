@@ -256,7 +256,6 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	protected $qb_cache_no_escape			= array();
 
-	protected $small_cache		    = array();
 	protected $small_field		    = array();
 	// --------------------------------------------------------------------
 
@@ -2762,21 +2761,21 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	public function field($value=array(),$table=null){
 		if (is_null($table)) $this->small_field=$value;
 		else{
-			$this->load_cache($table);
-			$this->small_field=array_diff($this->small_cache[$table], $value);
+			$this->small_field=array_diff($this->_get_cache($table), $value);
 		}
 		return $this;
 	}
 	
-	public function load_cache($table){
-		if (!array_key_exists($table,$this->small_cache))
-			$this->small_cache[$table]=json_decode(file_get_contents(APPPATH.'Runtime/data/'.$table.'.json'),TRUE);
+	protected function _get_cache($table){
+		static $cache=[];
+		if (!array_key_exists($table,$cache))
+			$cache[$table]=json_decode(file_get_contents(APPPATH.'Runtime/data/'.$table.'.json'),TRUE);
+		return $cache[$table];
 	}
 	
-	public function create($table='',$ispost=TRUE){
-		$this->load_cache($table);
+	public function create($table,$ispost=TRUE){
 		if (empty($this->small_field)){
-			$field=$this->small_cache[$table];//not set field,get all
+			$field=$this->_get_cache($table);//not set field,get all
 		}else{
 			$field=$this->small_field;
 			$this->small_field=array();
