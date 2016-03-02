@@ -2814,7 +2814,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$this->small_cache[$table]=json_decode(file_get_contents(APPPATH.'Runtime/data/'.$table.'.json'),TRUE);
 	}
 	
-	public function create($table=''){
+	public function create($table='',$ispost=TRUE){
 		$this->load_cache($table);
 		if (empty($this->small_field)){
 			$field=$this->small_cache[$table];//not set field,get all
@@ -2823,9 +2823,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$this->small_field=array();
 		}
 		$res=array();
+		$SEC =& load_class('Security', 'core');
+		if ($ispost) $input=$_POST;
+		else parse_str(file_get_contents('php://input'), $input);
 		foreach ($field as $value) {
-			if (isset($_POST[$value]))
-				$res[$value]=$this->security->xss_clean($_POST[$value]);
+			if (isset($input[$value]))
+				$res[$value]=$SEC->xss_clean($input[$value]);
 		}
 		return $res;
 	}
