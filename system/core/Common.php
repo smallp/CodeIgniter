@@ -850,6 +850,7 @@ if ( ! function_exists('function_usable'))
 function restful($code=204,$data='操作成功！') {
 	set_status_header($code);
 	header('Content-Type:application/json; charset=utf-8');
+	$code==204&&exit();
 	echo json_encode(is_string($data)?['info'=>$data]:$data);
 	exit();
 }
@@ -884,6 +885,9 @@ class MyException extends Exception {
 			break;
 			case self::GONE:
 			return '此条数据不存在';
+			break;
+			case self::CONFLICT:
+			return '此条数据已存在';
 			break;
 			case self::DATABASE:
 			return '服务器繁忙';

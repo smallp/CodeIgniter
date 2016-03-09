@@ -268,7 +268,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	mixed
 	 * @return	CI_DB_query_builder
 	 */
-	public function select($select = '*', $escape = NULL)
+	public function select($select = '*', $escape = FALSE)
 	{
 		if (is_string($select))
 		{
@@ -510,7 +510,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	whether not to try to escape identifiers
 	 * @return	CI_DB_query_builder
 	 */
-	public function join($table, $cond, $type = '', $escape = NULL)
+	public function join($table, $cond, $type = '', $escape = FALSE)
 	{
 		if ($type !== '')
 		{
@@ -1173,7 +1173,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
 	 */
-	public function order_by($orderby, $direction = '', $escape = NULL)
+	public function order_by($orderby, $direction = '', $escape = FALSE)
 	{
 		$direction = strtoupper(trim($direction));
 
