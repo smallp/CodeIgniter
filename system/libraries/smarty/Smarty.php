@@ -400,14 +400,14 @@ class Smarty extends Smarty_Internal_TemplateBase
      *
      * @var string
      */
-    public $left_delimiter = "{";
+    public $left_delimiter = "{%";
 
     /**
      * template right-delimiter
      *
      * @var string
      */
-    public $right_delimiter = "}";
+    public $right_delimiter = "%}";
 
     /**#@+
      * security
