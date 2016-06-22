@@ -854,6 +854,10 @@ function restful($code=204,$data='操作成功！') {
 	echo json_encode(is_string($data)?['info'=>$data]:$data);
 	exit();
 }
+function jump($url) {
+	header('Location: '.$url, TRUE, 301);
+	exit();
+}
 function getToken() {
 	if (isset($_SERVER['HTTP_TOKEN'])){
 		return ['token'=>$_SERVER['HTTP_TOKEN'],'id'=>$_SERVER['HTTP_UID']];
@@ -865,6 +869,7 @@ class MyException extends Exception {
 	const INPUT_MISS=402;
 	const NO_RIGHTS=403;
 	const CONFLICT=409;
+	const DONE=409;
 	const GONE=410;
 	const THIRD=502;
 	const DATABASE=503;
@@ -888,6 +893,9 @@ class MyException extends Exception {
 			break;
 			case self::CONFLICT:
 			return '此条数据已存在';
+			break;
+			case self::DONE:
+			return '你已经操作过了';
 			break;
 			case self::DATABASE:
 			return '服务器繁忙';
