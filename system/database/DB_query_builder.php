@@ -1340,7 +1340,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the table
 	 * @param	string	the limit clause
 	 * @param	string	the offset clause
-	 * @return	object
+	 * @return	CI_DB_result
 	 */
 	public function get($table = '', $limit = NULL, $offset = NULL)
 	{
@@ -1445,7 +1445,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	bool	$escape	Whether to escape values and identifiers
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_batch($table = '', $set = NULL, $escape = NULL)
+	public function insert_batch($table = '', $set = NULL, $escape = NULL,$ignore=FALSE)
 	{
 		if ($set !== NULL)
 		{
@@ -1472,7 +1472,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$affected_rows = 0;
 		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += 100)
 		{
-			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, 100)));
+			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, 100),$ignore));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1492,9 +1492,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	array	$values	INSERT values
 	 * @return	string
 	 */
-	protected function _insert_batch($table, $keys, $values)
+	protected function _insert_batch($table, $keys, $values,$ignore=FALSE)
 	{
-		return 'INSERT INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
+		$ignore=$ignore?'IGNORE ':'';
+		return 'INSERT '.$ignore.'INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
 
 	// --------------------------------------------------------------------
@@ -2748,7 +2749,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 	public function find($table,$value,$key='id',$select='*')
 	{
-		return $this->query("SELECT $select FROM $table WHERE $key=? limit 1",$value)->row_array();
+		return $this->query("SELECT $select FROM $table WHERE $key=? limit 1",[$value])->row_array();
 	}
 	
 	/**
@@ -2756,7 +2757,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	array	target field
 	 * @param	string	table
-	 * @return	void
+	 * @return	CI_DB_query_builder
 	 */
 	public function field($value=array(),$table=null){
 		if (is_null($table)) $this->small_field=$value;
@@ -2773,7 +2774,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		return $cache[$table];
 	}
 	
-	public function create($table,$ispost=TRUE){
+	/**
+	 *  Get needed data
+	 *
+	 * @return array Recieved data
+	 */
+	public function create($table='',$ispost=TRUE){
 		if (empty($this->small_field)){
 			$field=$this->_get_cache($table);//not set field,get all
 		}else{
@@ -2794,7 +2800,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	/**
 	 *  setInc and setDec
 	 *
-	 * @return	effected rows
+	 * @return bool success
 	 */
 	function step($table,$key,$isInc=TRUE,$num=1) {
 		$num=$isInc?"+$num":"-$num";
