@@ -170,7 +170,7 @@ class CI_Log {
 			return FALSE;
 		}
 
-		$filepath = $this->_log_path.'log-'.date('Y-m-d').'.'.$this->_file_ext;
+		$filepath = $this->_log_path.'log-'.($level=='ERROR'?'err':'').date('Y-m-d').'.'.$this->_file_ext;
 
 		// Instantiating DateTime with microseconds appended to initial date is needed for proper support of this format
 		if (strpos($this->_date_fmt, 'u') !== FALSE)
