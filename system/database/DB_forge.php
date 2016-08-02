@@ -181,6 +181,7 @@ abstract class CI_DB_forge {
 			}
 		}else{
 			$data=$this->db->query("SHOW COLUMNS FROM `$name`")->result_array();
+			if (empty($data)) throw new MyException("Table $name is not exist.",MyException::DATABASE);
 			$res=array();
 			foreach ($data as $value) {
 				$res[]=$value['Field'];

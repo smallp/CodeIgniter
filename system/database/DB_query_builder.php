@@ -2808,8 +2808,16 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	
 	protected function _get_cache($table){
 		static $cache=[];
-		if (!array_key_exists($table,$cache))
-			$cache[$table]=json_decode(file_get_contents(APPPATH.'Runtime/data/'.$table.'.json'),TRUE);
+		if (!array_key_exists($table,$cache)){
+			$file=APPPATH.'Runtime/data/'.$table.'.json';
+			if (file_exists($file))
+				$cache[$table]=json_decode(file_get_contents($file),TRUE);
+			else{
+				$this->load->dbforge();
+				$this->dbforge->column_cache($table);
+				return $this->_get_cache($table);
+			}
+		}
 		return $cache[$table];
 	}
 	
