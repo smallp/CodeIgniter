@@ -168,15 +168,15 @@ if ( ! function_exists('load_class'))
 		}
 
 		// Is the request a class extension? If so we load it too
-		if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php'))
-		{
-			$name = config_item('subclass_prefix').$class;
+// 		if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php'))
+// 		{
+// 			$name = config_item('subclass_prefix').$class;
 
-			if (class_exists($name, FALSE) === FALSE)
-			{
-				require_once(APPPATH.$directory.'/'.$name.'.php');
-			}
-		}
+// 			if (class_exists($name, FALSE) === FALSE)
+// 			{
+// 				require_once(APPPATH.$directory.'/'.$name.'.php');
+// 			}
+// 		}
 
 		// Did we find the class?
 		if ($name === FALSE)

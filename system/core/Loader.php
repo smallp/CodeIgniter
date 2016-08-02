@@ -295,7 +295,7 @@ class CI_Loader {
 		//       sub-optimal otherwise anyway.
 		if ( ! class_exists('CI_Model', FALSE))
 		{
-			$app_path = APPPATH.'core'.DIRECTORY_SEPARATOR;
+			/*$app_path = APPPATH.'core'.DIRECTORY_SEPARATOR;
 			if (file_exists($app_path.'Model.php'))
 			{
 				require_once($app_path.'Model.php');
@@ -304,9 +304,9 @@ class CI_Loader {
 					throw new RuntimeException($app_path."Model.php exists, but doesn't declare class CI_Model");
 				}
 			}
-			elseif ( ! class_exists('CI_Model', FALSE))
+			else if ( ! class_exists('CI_Model', FALSE))
 			{
-				require_once(BASEPATH.'core'.DIRECTORY_SEPARATOR.'Model.php');
+				*/require_once(BASEPATH.'core'.DIRECTORY_SEPARATOR.'Model.php');/*
 			}
 
 			$class = config_item('subclass_prefix').'Model';
@@ -317,11 +317,11 @@ class CI_Loader {
 				{
 					throw new RuntimeException($app_path.$class.".php exists, but doesn't declare class ".$class);
 				}
-			}
+			}*/
 		}
 
 		$model = ucfirst($model);
-		if ( ! class_exists($model))
+		/*if ( ! class_exists($model))
 		{
 			foreach ($this->_ci_model_paths as $mod_path)
 			{
@@ -343,10 +343,10 @@ class CI_Loader {
 				throw new RuntimeException('Unable to locate the model you have specified: '.$name);
 			}
 		}
-// 		elseif ( ! is_subclass_of($model, 'CI_Model'))
-// 		{
-// 			throw new RuntimeException("Class ".$model." already exists and doesn't extend CI_Model");
-// 		}
+		elseif ( ! is_subclass_of($model, 'CI_Model'))
+		{
+			throw new RuntimeException("Class ".$model." already exists and doesn't extend CI_Model");
+		}*/
 		$this->_ci_models[] = $name;
 		$CI->$name = new $model();
 		return $this;

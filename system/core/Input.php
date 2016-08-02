@@ -188,8 +188,11 @@ class CI_Input {
 			$output = array();
 			foreach ($index as $key)
 			{
-				$output[$key] = $this->_fetch_from_array($array, $key, $xss_clean);
-				if (is_null($output[$key])) return NULL;
+				$value = $this->_fetch_from_array($array, $key, $xss_clean);
+				if (is_null($value)){
+					if ($default) continue;
+					else return NULL;
+				}else $output[$key]=$value;
 			}
 
 			return $output;
@@ -260,7 +263,8 @@ class CI_Input {
 	
 	public function put($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		parse_str(file_get_contents('php://input'),$data);
+		static $data=NULL;
+		$data||parse_str(file_get_contents('php://input'),$data);
 		return $this->_fetch_from_array($data, $index, $xss_clean,$default);
 	}
 
