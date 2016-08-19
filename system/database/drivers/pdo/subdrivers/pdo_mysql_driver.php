@@ -122,7 +122,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		if (isset($this->stricton))
+		/*if (isset($this->stricton))
 		{
 			if ($this->stricton)
 			{
@@ -151,7 +151,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = '.$sql;
 				}
 			}
-		}
+		}*/
 
 		if ($this->compress === TRUE)
 		{
