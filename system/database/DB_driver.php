@@ -972,6 +972,23 @@ abstract class CI_DB_driver {
 
 		return FALSE;
 	}
+	
+	/**
+	 * Force Rollback Transaction, ignore nest transactions
+	 *
+	 * @return	bool
+	 */
+	public function trans_rollback_f()
+	{
+		if ( ! $this->trans_enabled OR $this->_trans_depth === 0)
+		{
+			return FALSE;
+		}else{
+			$this->_trans_rollback();
+			$this->_trans_depth=0;
+			return TRUE;
+		}
+	}
 
 	// --------------------------------------------------------------------
 

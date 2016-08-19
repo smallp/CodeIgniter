@@ -122,18 +122,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		/* Prior to PHP 5.3.6, even if the charset was supplied in the DSN
-		 * on connect - it was ignored. This is a work-around for the issue.
-		 *
-		 * Reference: http://www.php.net/manual/en/ref.pdo-mysql.connection.php
-		 */
-		if ( ! is_php('5.3.6') && ! empty($this->char_set))
-		{
-			$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES '.$this->char_set
-				.(empty($this->dbcollat) ? '' : ' COLLATE '.$this->dbcollat);
-		}
-
-		if (isset($this->stricton))
+		/*if (isset($this->stricton))
 		{
 			if ($this->stricton)
 			{
@@ -162,7 +151,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = '.$sql;
 				}
 			}
-		}
+		}*/
 
 		if ($this->compress === TRUE)
 		{
