@@ -459,7 +459,8 @@ class CI_Router {
 	 */
 	public function set_method($method)
 	{
-		if ($this->config->item('restful')===TRUE){
+		if ($this->config->item('restful')===TRUE
+				&&isset($_SERVER['REQUEST_METHOD'])){
 			switch ($_SERVER['REQUEST_METHOD']) {
 				case 'POST':
 				$this->method = 'add'.$method;
