@@ -2813,8 +2813,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			if (file_exists($file))
 				$cache[$table]=json_decode(file_get_contents($file),TRUE);
 			else{
-				$this->load->dbforge();
-				$this->dbforge->column_cache($table);
+				$CI=& get_instance();
+				$CI->load->dbforge();
+				$CI->dbforge->column_cache($table);
 				return $this->_get_cache($table);
 			}
 		}
