@@ -864,6 +864,20 @@ function jump($url) {
 	header('Location: '.$url, TRUE, 301);
 	exit();
 }
+function jump_back($info){
+print <<<END
+<meta charset="UTF-8">
+<script>alert('$info');history.back(-1);</script>
+END;
+	exit();
+}
+function jump_to($info,$url){
+print <<<END
+<meta charset="UTF-8">
+<script>alert('$info');location.href='$url';</script>
+END;
+	exit();
+}
 function getToken() {
 	if (isset($_SERVER['HTTP_TOKEN'])){
 		return ['token'=>$_SERVER['HTTP_TOKEN'],'id'=>$_SERVER['HTTP_UID']];
