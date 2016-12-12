@@ -1497,7 +1497,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Batch this baby
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_size)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += 100)
 		{
 			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, 100),$ignore));
 			$affected_rows += $this->affected_rows();
