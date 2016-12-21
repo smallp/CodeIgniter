@@ -67,7 +67,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		require_once(APPPATH.'config/'.ENVIRONMENT.'/constants.php');
 	}
 
-	require_once(APPPATH.'config/constants.php');
+	if (file_exists(APPPATH.'config/constants.php'))
+	{
+		require_once(APPPATH.'config/constants.php');
+	}
 
 /*
  * ------------------------------------------------------
@@ -205,7 +208,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *  Instantiate the UTF-8 class
  * ------------------------------------------------------
  */
-	$UNI =& load_class('Utf8', 'core');
+	$UNI =& load_class('Utf8', 'core', $charset);
 
 /*
  * ------------------------------------------------------
@@ -243,14 +246,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Load the security class for xss and csrf support
  * -----------------------------------------------------
  */
-	$SEC =& load_class('Security', 'core');
+	$SEC =& load_class('Security', 'core', $charset);
 
 /*
  * ------------------------------------------------------
  *  Load the Input class and sanitize globals
  * ------------------------------------------------------
  */
-	$IN	=& load_class('Input', 'core');
+	$IN =& load_class('Input', 'core', $SEC);
 
 /*
  * ------------------------------------------------------
