@@ -597,15 +597,21 @@ class CI_Loader {
 	 */
 	public function helper($helpers = array())
 	{
-		foreach ($this->_ci_prep_filename($helpers, '_helper') as $helper)
+		is_array($helpers) OR $helpers = array($helpers);
+		foreach ($helpers as &$helper)
 		{
+			$filename = basename($helper);
+			$filepath = ($filename === $helper) ? '' : substr($helper, 0, strlen($helper) - strlen($filename));
+			$filename = strtolower(preg_replace('#(_helper)?(.php)?$#i', '', $filename)).'_helper';
+			$helper   = $filepath.$filename;
+
 			if (isset($this->_ci_helpers[$helper]))
 			{
 				continue;
 			}
 
 			// Is this a helper extension request?
-			$ext_helper = config_item('subclass_prefix').$helper;
+			$ext_helper = config_item('subclass_prefix').$filename;
 			$ext_loaded = FALSE;
 			foreach ($this->_ci_helper_paths as $path)
 			{
@@ -954,7 +960,7 @@ class CI_Loader {
 		}
 		extract($this->_ci_cached_vars);
 
-		/*
+		/**
 		 * Buffer the output
 		 *
 		 * We buffer the output for two reasons:
@@ -967,18 +973,7 @@ class CI_Loader {
 		 */
 		ob_start();
 
-		// If the PHP installation does not support short tags we'll
-		// do a little string replacement, changing the short tags
-		// to standard PHP echo statements.
-		if ( ! is_php('5.4') && ! ini_get('short_open_tag') && config_item('rewrite_short_tags') === TRUE)
-		{
-			echo eval('?>'.preg_replace('/;*\s*\?>/', '; ?>', str_replace('<?=', '<?php echo ', file_get_contents($_ci_path))));
-		}
-		else
-		{
-			include($_ci_path); // include() vs include_once() allows for multiple views with the same name
-		}
-
+		include($_ci_path); // include() vs include_once() allows for multiple views with the same name
 		log_message('info', 'File loaded: '.$_ci_path);
 
 		// Return the file data if requested
@@ -1410,34 +1405,4 @@ class CI_Loader {
 		$CI =& get_instance();
 		return $CI->$component;
 	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Prep filename
-	 *
-	 * This function prepares filenames of various items to
-	 * make their loading more reliable.
-	 *
-	 * @param	string|string[]	$filename	Filename(s)
-	 * @param 	string		$extension	Filename extension
-	 * @return	array
-	 */
-	protected function _ci_prep_filename($filename, $extension)
-	{
-		if ( ! is_array($filename))
-		{
-			return array(strtolower(str_replace(array($extension, '.php'), '', $filename).$extension));
-		}
-		else
-		{
-			foreach ($filename as $key => $val)
-			{
-				$filename[$key] = strtolower(str_replace(array($extension, '.php'), '', $val).$extension);
-			}
-
-			return $filename;
-		}
-	}
-
 }
