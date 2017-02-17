@@ -2871,6 +2871,6 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	function between($key,$v1,$v2) {
 		$value=$this->escape($v1).' AND '.$this->escape($v2);
-		return $this->_wh('qb_where', $key.' BETWEEN', $value, 'AND ', FALSE);
+		return $this->_wh('qb_where', $key.' BETWEEN ', $value, 'AND ', FALSE);
 	}
 }

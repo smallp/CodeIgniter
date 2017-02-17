@@ -72,12 +72,19 @@ class CI_Controller {
 		// so that CI can run as one big super object.
 		foreach (is_loaded() as $var => $class)
 		{
+			$this->$var=null;
 			$this->$var =& load_class($class);
 		}
-
+		$this->load=null;
 		$this->load =& load_class('Loader', 'core');
 		$this->load->initialize();
 		log_message('info', 'Controller Class Initialized');
+	}
+	
+	function __get($param) {
+		if ($param=='db') $this->load->database();
+		else $this->load->model($param);
+		return $this->$param;
 	}
 
 	// --------------------------------------------------------------------
