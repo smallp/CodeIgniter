@@ -180,6 +180,7 @@ abstract class CI_DB_forge {
 				}
 			}
 		}else{
+			$name=$this->db->escape_str($name);
 			$data=$this->db->query("SHOW COLUMNS FROM `$name`")->result_array();
 			if (empty($data)) throw new MyException("Table $name is not exist.",MyException::DATABASE);
 			$res=array();
