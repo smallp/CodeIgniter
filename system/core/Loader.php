@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -321,7 +321,7 @@ class CI_Loader {
 		}
 
 		$model = ucfirst($model);
-		if ( ! class_exists($model))
+		if ( ! class_exists($model, FALSE))
 		{
 			foreach ($this->_ci_model_paths as $mod_path)
 			{
@@ -525,19 +525,13 @@ class CI_Loader {
 	 */
 	public function vars($vars, $val = '')
 	{
-		if (is_string($vars))
-		{
-			$vars = array($vars => $val);
-		}
+		$vars = is_string($vars)
+			? array($vars => $val)
+			: $this->_ci_prepare_view_vars($vars);
 
-		$vars = $this->_ci_object_to_array($vars);
-
-		if (is_array($vars) && count($vars) > 0)
+		foreach ($vars as $key => $val)
 		{
-			foreach ($vars as $key => $val)
-			{
-				$this->_ci_cached_vars[$key] = $val;
-			}
+			$this->_ci_cached_vars[$key] = $val;
 		}
 
 		return $this;
@@ -602,7 +596,7 @@ class CI_Loader {
 		{
 			$filename = basename($helper);
 			$filepath = ($filename === $helper) ? '' : substr($helper, 0, strlen($helper) - strlen($filename));
-			$filename = strtolower(preg_replace('#(_helper)?(.php)?$#i', '', $filename)).'_helper';
+			$filename = strtolower(preg_replace('#(_helper)?(\.php)?$#i', '', $filename)).'_helper';
 			$helper   = $filepath.$filename;
 
 			if (isset($this->_ci_helpers[$helper]))
@@ -946,18 +940,7 @@ class CI_Loader {
 		 * the two types and cache them so that views that are embedded within
 		 * other views can have access to these variables.
 		 */
-		if (is_array($_ci_vars))
-		{
-			foreach (array_keys($_ci_vars) as $key)
-			{
-				if (strncmp($key, '_ci_', 4) === 0)
-				{
-					unset($_ci_vars[$key]);
-				}
-			}
-
-			$this->_ci_cached_vars = array_merge($this->_ci_cached_vars, $_ci_vars);
-		}
+		empty($_ci_vars) OR $this->_ci_cached_vars = array_merge($this->_ci_cached_vars, $_ci_vars);
 		extract($this->_ci_cached_vars);
 
 		/**
@@ -1377,17 +1360,32 @@ class CI_Loader {
 	// --------------------------------------------------------------------
 
 	/**
-	 * CI Object to Array translator
+	 * Prepare variables for _ci_vars, to be later extract()-ed inside views
 	 *
-	 * Takes an object as input and converts the class variables to
-	 * an associative array with key/value pairs.
+	 * Converts objects to associative arrays and filters-out internal
+	 * variable names (i.e. keys prefixed with '_ci_').
 	 *
-	 * @param	object	$object	Object data to translate
+	 * @param	mixed	$vars
 	 * @return	array
 	 */
-	protected function _ci_object_to_array($object)
+	protected function _ci_prepare_view_vars($vars)
 	{
-		return is_object($object) ? get_object_vars($object) : $object;
+		if ( ! is_array($vars))
+		{
+			$vars = is_object($vars)
+				? get_object_vars($vars)
+				: array();
+		}
+
+		foreach (array_keys($vars) as $key)
+		{
+			if (strncmp($key, '_ci_', 4) === 0)
+			{
+				unset($vars[$key]);
+			}
+		}
+
+		return $vars;
 	}
 
 	// --------------------------------------------------------------------

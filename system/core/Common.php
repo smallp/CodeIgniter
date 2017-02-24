@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -318,17 +318,16 @@ if ( ! function_exists('get_mimes'))
 
 		if (empty($_mimes))
 		{
+			$_mimes = array();
+
+			if (file_exists(APPPATH.'config/mimes.php'))
+			{
+				$_mimes = array_merge($_mimes, include(APPPATH.'config/mimes.php'));
+			}
+
 			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
 			{
-				$_mimes = include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php');
-			}
-			elseif (file_exists(APPPATH.'config/mimes.php'))
-			{
-				$_mimes = include(APPPATH.'config/mimes.php');
-			}
-			else
-			{
-				$_mimes = array();
+				$_mimes = array_merge($_mimes, include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'));
 			}
 		}
 
@@ -409,11 +408,6 @@ if ( ! function_exists('show_error'))
 		if ($status_code < 100)
 		{
 			$exit_status = $status_code + 9; // 9 is EXIT__AUTO_MIN
-			if ($exit_status > 125) // 125 is EXIT__AUTO_MAX
-			{
-				$exit_status = 1; // EXIT_ERROR
-			}
-
 			$status_code = 500;
 		}
 		else
@@ -721,6 +715,7 @@ if ( ! function_exists('remove_invisible_characters'))
 		{
 			$non_displayables[] = '/%0[0-8bcef]/i';	// url encoded 00-08, 11, 12, 14, 15
 			$non_displayables[] = '/%1[0-9a-f]/i';	// url encoded 16-31
+			$non_displayables[] = '/%7f/i';	// url encoded 127
 		}
 
 		$non_displayables[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S';	// 00-08, 11, 12, 14-31, 127
@@ -824,7 +819,7 @@ if ( ! function_exists('function_usable'))
 	 * terminate script execution if a disabled function is executed.
 	 *
 	 * The above described behavior turned out to be a bug in Suhosin,
-	 * but even though a fix was commited for 0.9.34 on 2012-02-12,
+	 * but even though a fix was committed for 0.9.34 on 2012-02-12,
 	 * that version is yet to be released. This function will therefore
 	 * be just temporary, but would probably be kept for a few years.
 	 *
