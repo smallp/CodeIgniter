@@ -849,7 +849,9 @@ if ( ! function_exists('function_usable'))
 }
 spl_autoload_register(function ($class) {
     $ci=&get_instance();
-	$ci->load->model($class);
+	try{
+		$ci->load->model($class,'',false);
+	}catch(Exception $e){}
 });
 function restful($code=204,$data='操作成功！') {
 	set_status_header($code);
