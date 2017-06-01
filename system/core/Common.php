@@ -847,6 +847,10 @@ if ( ! function_exists('function_usable'))
 		return FALSE;
 	}
 }
+spl_autoload_register(function ($class) {
+    $ci=&get_instance();
+	$ci->load->model($class);
+});
 function restful($code=204,$data='操作成功！') {
 	set_status_header($code);
 	header('Content-Type:application/json; charset=utf-8');
@@ -898,7 +902,10 @@ class MyException extends Exception {
 			return '你已经操作过了';
 			break;
 			case self::DATABASE:
-			return '服务器繁忙';
+			$code=&get_instance();
+			$code=$code->db->error();
+			$code=$code['code'];
+			return (strstr($code['code'],'1062'))?'冲突！请确认此数据是否已存在':'服务器繁忙';
 			break;
 			default:
 			return '';
