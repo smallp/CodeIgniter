@@ -228,10 +228,10 @@ class CI_Loader {
 	 *
 	 * @param	string	$model		Model name
 	 * @param	string	$name		An optional object name to assign to
-	 * @param	bool	$db_conn	An optional database connection configuration to initialize
+	 * @param	bool	$init   	An optional to initialize the class
 	 * @return	object
 	 */
-	public function model($model, $name = '', $db_conn = FALSE)
+	public function model($model, $name = '',$init=true)
 	{
 		if (empty($model))
 		{
@@ -241,7 +241,7 @@ class CI_Loader {
 		{
 			foreach ($model as $key => $value)
 			{
-				is_int($key) ? $this->model($value, '', $db_conn) : $this->model($key, $value, $db_conn);
+				is_int($key) ? $this->model($value, '', $init) : $this->model($key, $value, $init);
 			}
 
 			return $this;
@@ -275,16 +275,6 @@ class CI_Loader {
 			throw new RuntimeException('The model name you are loading is the name of a resource that is already being used: '.$name);
 		}
 
-		if ($db_conn !== FALSE && ! class_exists('CI_DB', FALSE))
-		{
-			if ($db_conn === TRUE)
-			{
-				$db_conn = '';
-			}
-
-			$this->database($db_conn, FALSE, TRUE);
-		}
-
 		// Note: All of the code under this condition used to be just:
 		//
 		//       load_class('Model', 'core');
@@ -295,29 +285,7 @@ class CI_Loader {
 		//       sub-optimal otherwise anyway.
 		if ( ! class_exists('CI_Model', FALSE))
 		{
-			/*$app_path = APPPATH.'core'.DIRECTORY_SEPARATOR;
-			if (file_exists($app_path.'Model.php'))
-			{
-				require_once($app_path.'Model.php');
-				if ( ! class_exists('CI_Model', FALSE))
-				{
-					throw new RuntimeException($app_path."Model.php exists, but doesn't declare class CI_Model");
-				}
-			}
-			else if ( ! class_exists('CI_Model', FALSE))
-			{
-				*/require_once(BASEPATH.'core'.DIRECTORY_SEPARATOR.'Model.php');/*
-			}
-
-			$class = config_item('subclass_prefix').'Model';
-			if (file_exists($app_path.$class.'.php'))
-			{
-				require_once($app_path.$class.'.php');
-				if ( ! class_exists($class, FALSE))
-				{
-					throw new RuntimeException($app_path.$class.".php exists, but doesn't declare class ".$class);
-				}
-			}*/
+			require_once(BASEPATH.'core'.DIRECTORY_SEPARATOR.'Model.php');
 		}
 
 		$model = ucfirst($model);
@@ -343,13 +311,11 @@ class CI_Loader {
 				throw new RuntimeException('Unable to locate the model you have specified: '.$name);
 			}
 		}
-		/*elseif ( ! is_subclass_of($model, 'CI_Model'))
-		{
-			throw new RuntimeException("Class ".$model." already exists and doesn't extend CI_Model");
-		}*/
-		$this->_ci_models[] = $name;
-		$CI->$name = new $model();
-		return $this;
+		if ($init){
+			$this->_ci_models[] = $name;
+			$CI->$name = new $model();
+			return $this;
+		}
 	}
 
 	// --------------------------------------------------------------------
