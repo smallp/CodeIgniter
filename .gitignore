@@ -11,4 +11,4 @@ application/logs/*
 .buildpath
 .project
 .settings
-
+.idea/*
