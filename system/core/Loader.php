@@ -1173,20 +1173,10 @@ class CI_Loader {
 						include($path.'config/'.strtolower($class).'.php');
 						$found = TRUE;
 					}
-					elseif (file_exists($path.'config/'.ucfirst(strtolower($class)).'.php'))
-					{
-						include($path.'config/'.ucfirst(strtolower($class)).'.php');
-						$found = TRUE;
-					}
 
 					if (file_exists($path.'config/'.ENVIRONMENT.'/'.strtolower($class).'.php'))
 					{
 						include($path.'config/'.ENVIRONMENT.'/'.strtolower($class).'.php');
-						$found = TRUE;
-					}
-					elseif (file_exists($path.'config/'.ENVIRONMENT.'/'.ucfirst(strtolower($class)).'.php'))
-					{
-						include($path.'config/'.ENVIRONMENT.'/'.ucfirst(strtolower($class)).'.php');
 						$found = TRUE;
 					}
 
