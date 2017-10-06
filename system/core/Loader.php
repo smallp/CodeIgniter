@@ -458,7 +458,7 @@ class CI_Loader {
 		}
 		if (!empty($vars))
 			$CI->smarty->assign($vars);
-		$CI->smarty->display($view.'.tpl');
+		$CI->smarty->display($view.'.html');
 	}
 
 	// --------------------------------------------------------------------
