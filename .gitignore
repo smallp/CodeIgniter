@@ -1,14 +1,14 @@
 .DS_Store
 
 application/cache/*
-!application/cache/index.html
-!application/cache/.htaccess
+application/config/*
 application/Runtime/*
-
 application/logs/*
-!application/logs/index.html
-!application/logs/.htaccess
 .buildpath
 .project
 .settings
 .idea/*
+
+!application/*/.htaccess
+
+/vendor/

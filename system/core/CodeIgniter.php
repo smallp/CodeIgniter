@@ -120,20 +120,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
  * ------------------------------------------------------
- *  Instantiate the hooks class
- * ------------------------------------------------------
- */
-// 	$EXT =& load_class('Hooks', 'core');
-
-/*
- * ------------------------------------------------------
- *  Is there a "pre_system" hook?
- * ------------------------------------------------------
- */
-// 	$EXT->call_hook('pre_system');
-
-/*
- * ------------------------------------------------------
  *  Instantiate the config class
  * ------------------------------------------------------
  *
@@ -152,6 +138,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			$CFG->set_item($key, $value);
 		}
 	}
+
+/*
+ * ------------------------------------------------------
+ *  Instantiate the hooks class
+ * ------------------------------------------------------
+ */
+	$EXT =& load_class('Hooks', 'core', $CFG);
+
+/*
+ * ------------------------------------------------------
+ *  Is there a "pre_system" hook?
+ * ------------------------------------------------------
+ */
+	$EXT->call_hook('pre_system');
 
 /*
  * ------------------------------------------------------
@@ -339,11 +339,31 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		// work-around until a better alternative is available.
 		elseif ( ! in_array(strtolower($method), array_map('strtolower', get_class_methods($class)), TRUE))
 		{
-			/*if (file_exists(VIEWPATH.$class."/$method.html")){
-				$load=&load_class('Loader', 'core');
-				$load->view($class."/$method.html");
-				exit();
-			}else */$e404 = TRUE;
+			$params = array($method, array_slice($URI->rsegments, 2));
+			$method = '_remap';
+		}
+		elseif ( ! method_exists($class, $method))
+		{
+			$e404 = TRUE;
+		}
+		/**
+		 * DO NOT CHANGE THIS, NOTHING ELSE WORKS!
+		 *
+		 * - method_exists() returns true for non-public methods, which passes the previous elseif
+		 * - is_callable() returns false for PHP 4-style constructors, even if there's a __construct()
+		 * - method_exists($class, '__construct') won't work because CI_Controller::__construct() is inherited
+		 * - People will only complain if this doesn't work, even though it is documented that it shouldn't.
+		 *
+		 * ReflectionMethod::isConstructor() is the ONLY reliable check,
+		 * knowing which method will be executed as a constructor.
+		 */
+		elseif ( ! is_callable(array($class, $method)))
+		{
+			$reflection = new ReflectionMethod($class, $method);
+			if ( ! $reflection->isPublic() OR $reflection->isConstructor())
+			{
+				$e404 = TRUE;
+			}
 		}
 	}
 

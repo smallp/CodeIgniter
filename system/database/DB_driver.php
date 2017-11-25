@@ -854,6 +854,7 @@ abstract class CI_DB_driver {
 
 		if ($this->_trans_begin())
 		{
+			$this->_trans_status = TRUE;
 			$this->_trans_depth++;
 			return TRUE;
 		}
@@ -999,7 +1000,7 @@ abstract class CI_DB_driver {
 	 */
 	public function is_write_type($sql)
 	{
-		return (bool) preg_match('/^\s*"?(SET|INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|TRUNCATE|LOAD|COPY|ALTER|RENAME|GRANT|REVOKE|LOCK|UNLOCK|REINDEX)\s/i', $sql);
+		return (bool) preg_match('/^\s*"?(SET|INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|TRUNCATE|LOAD|COPY|ALTER|RENAME|GRANT|REVOKE|LOCK|UNLOCK|REINDEX|MERGE)\s/i', $sql);
 	}
 
 	// --------------------------------------------------------------------
@@ -1337,10 +1338,11 @@ abstract class CI_DB_driver {
 	 *
 	 * This function escapes column and table names
 	 *
-	 * @param	mixed
+	 * @param	mixed	$item	Identifier to escape
+	 * @param	bool	$split	Whether to split identifiers when a dot is encountered
 	 * @return	mixed
 	 */
-	public function escape_identifiers($item)
+	public function escape_identifiers($item, $split = TRUE)
 	{
 		if ($this->_escape_char === '' OR empty($item) OR in_array($item, $this->_reserved_identifiers))
 		{
@@ -1361,22 +1363,22 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 
-		static $preg_ec = array();
+		static $preg_ec;
 
 		if (empty($preg_ec))
 		{
 			if (is_array($this->_escape_char))
 			{
 				$preg_ec = array(
-					preg_quote($this->_escape_char[0], '/'),
-					preg_quote($this->_escape_char[1], '/'),
+					preg_quote($this->_escape_char[0]),
+					preg_quote($this->_escape_char[1]),
 					$this->_escape_char[0],
 					$this->_escape_char[1]
 				);
 			}
 			else
 			{
-				$preg_ec[0] = $preg_ec[1] = preg_quote($this->_escape_char, '/');
+				$preg_ec[0] = $preg_ec[1] = preg_quote($this->_escape_char);
 				$preg_ec[2] = $preg_ec[3] = $this->_escape_char;
 			}
 		}
@@ -1385,11 +1387,13 @@ abstract class CI_DB_driver {
 		{
 			if (strpos($item, '.'.$id) !== FALSE)
 			{
-				return preg_replace('/'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?\./i', $preg_ec[2].'$1'.$preg_ec[3].'.', $item);
+				return preg_replace('#'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?\.#i', $preg_ec[2].'$1'.$preg_ec[3].'.', $item);
 			}
 		}
 
-		return preg_replace('/'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?(\.)?/i', $preg_ec[2].'$1'.$preg_ec[3].'$2', $item);
+		$dot = ($split !== FALSE) ? '\.' : '';
+
+		return preg_replace('#'.$preg_ec[0].'?([^'.$preg_ec[1].$dot.']+)'.$preg_ec[1].'?(\.)?#i', $preg_ec[2].'$1'.$preg_ec[3].'$2', $item);
 	}
 
 	// --------------------------------------------------------------------
@@ -1803,14 +1807,14 @@ abstract class CI_DB_driver {
 		if ($offset = strripos($item, ' AS '))
 		{
 			$alias = ($protect_identifiers)
-				? substr($item, $offset, 4).$this->escape_identifiers(substr($item, $offset + 4))
+				? substr($item, $offset, 4).$this->escape_identifiers(substr($item, $offset + 4), FALSE)
 				: substr($item, $offset);
 			$item = substr($item, 0, $offset);
 		}
 		elseif ($offset = strrpos($item, ' '))
 		{
 			$alias = ($protect_identifiers)
-				? ' '.$this->escape_identifiers(substr($item, $offset + 1))
+				? ' '.$this->escape_identifiers(substr($item, $offset + 1), FALSE)
 				: substr($item, $offset);
 			$item = substr($item, 0, $offset);
 		}
@@ -1880,15 +1884,19 @@ abstract class CI_DB_driver {
 					$i++;
 				}
 
+				// dbprefix may've already been applied, with or without the identifier escaped
+				$ec = '(?<ec>'.preg_quote(is_array($this->_escape_char) ? $this->_escape_char[0] : $this->_escape_char).')?';
+				isset($ec[0]) && $ec .= '?'; // Just in case someone has disabled escaping by forcing an empty escape character
+
 				// Verify table prefix and replace if necessary
-				if ($this->swap_pre !== '' && strpos($parts[$i], $this->swap_pre) === 0)
+				if ($this->swap_pre !== '' && preg_match('#^'.$ec.preg_quote($this->swap_pre).'#', $parts[$i]))
 				{
-					$parts[$i] = preg_replace('/^'.$this->swap_pre.'(\S+?)/', $this->dbprefix.'\\1', $parts[$i]);
+					$parts[$i] = preg_replace('#^'.$ec.preg_quote($this->swap_pre).'(\S+?)#', '\\1'.$this->dbprefix.'\\2', $parts[$i]);
 				}
 				// We only add the table prefix if it does not already exist
-				elseif (strpos($parts[$i], $this->dbprefix) !== 0)
+				else
 				{
-					$parts[$i] = $this->dbprefix.$parts[$i];
+					preg_match('#^'.$ec.preg_quote($this->dbprefix).'#', $parts[$i]) OR $parts[$i] = $this->dbprefix.$parts[$i];
 				}
 
 				// Put the parts back together
