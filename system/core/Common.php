@@ -886,7 +886,7 @@ class MyException extends Exception {
 	const INPUT_MISS=402;
 	const NO_RIGHTS=403;
 	const CONFLICT=409;
-	const DONE=409;
+	const DONE=406;
 	const GONE=410;
 	const THIRD=502;
 	const DATABASE=503;
@@ -917,7 +917,6 @@ class MyException extends Exception {
 			case self::DATABASE:
 			$code=&get_instance();
 			$code=$code->db->error();
-			$code=$code['code'];
 			return (strstr($code['code'],'1062'))?'冲突！请确认此数据是否已存在':'服务器繁忙';
 			break;
 			default:
