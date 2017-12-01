@@ -858,7 +858,7 @@ function restful($code=204,$data='操作成功！') {
 	exit();
 }
 function jump($url) {
-	header('Location: '.$url, TRUE, 301);
+	header('Location: '.$url);
 	exit();
 }
 function getToken() {
