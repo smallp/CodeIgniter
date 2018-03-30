@@ -208,9 +208,7 @@ class CI_Input {
 	
 	public function put($index = NULL, $xss_clean = NULL,$default=NULL)
 	{
-		static $data=NULL;
-		$data||parse_str(file_get_contents('php://input'),$data);
-		return $this->_fetch_from_array($data, $index, $xss_clean,$default);
+		return $this->input_stream($index, $xss_clean,$default);
 	}
 
 	// --------------------------------------------------------------------
@@ -222,9 +220,9 @@ class CI_Input {
 	 * @param	bool	$xss_clean	Whether to apply XSS filtering
 	 * @return	mixed
 	 */
-	public function cookie($index = NULL, $xss_clean = FALSE)
+	public function cookie($index = NULL, $xss_clean = FALSE,$default=NULL)
 	{
-		return $this->_fetch_from_array($_COOKIE, $index, $xss_clean);
+		return $this->_fetch_from_array($_COOKIE, $index, $xss_clean,$default);
 	}
 
 	// --------------------------------------------------------------------
@@ -252,7 +250,7 @@ class CI_Input {
 	 * @param	bool	$xss_clean	Whether to apply XSS filtering
 	 * @return	mixed
 	 */
-	public function input_stream($index = NULL, $xss_clean = FALSE)
+	public function input_stream($index = NULL, $xss_clean = FALSE,$default=NULL)
 	{
 		// Prior to PHP 5.6, the input stream can only be read once,
 		// so we'll need to check if we have already done that first.
@@ -263,7 +261,7 @@ class CI_Input {
 			is_array($this->_input_stream) OR $this->_input_stream = array();
 		}
 
-		return $this->_fetch_from_array($this->_input_stream, $index, $xss_clean);
+		return $this->_fetch_from_array($this->_input_stream, $index, $xss_clean,$default);
 	}
 
 	// ------------------------------------------------------------------------
@@ -557,11 +555,11 @@ class CI_Input {
 	 *
 	 * Returns the value of a single member of the headers class member
 	 *
-	 * @param	string		$index		Header name
+	 * @param	string|array $index		Header name
 	 * @param	bool		$xss_clean	Whether to apply XSS filtering
 	 * @return	string|null	The requested header on success or NULL on failure
 	 */
-	public function get_request_header($index, $xss_clean = FALSE)
+	public function get_request_header($index, $xss_clean = FALSE,$default=null)
 	{
 		static $headers;
 
@@ -574,16 +572,7 @@ class CI_Input {
 			}
 		}
 
-		$index = strtolower($index);
-
-		if ( ! isset($headers[$index]))
-		{
-			return NULL;
-		}
-
-		return ($xss_clean === TRUE)
-			? $this->security->xss_clean($headers[$index])
-			: $headers[$index];
+		return $this->_fetch_from_array($headers, $index, $xss_clean,$default);
 	}
 
 	// --------------------------------------------------------------------

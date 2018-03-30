@@ -858,7 +858,7 @@ function restful($code=204,$data='操作成功！') {
 	exit();
 }
 function jump($url) {
-	header('Location: '.$url);
+	header('Location: '.$url, TRUE, 302);
 	exit();
 }
 function jump_back($info){
@@ -874,11 +874,6 @@ print <<<END
 <script>alert('$info');location.href='$url';</script>
 END;
 	exit();
-}
-function getToken() {
-	if (isset($_SERVER['HTTP_TOKEN'])){
-		return ['token'=>$_SERVER['HTTP_TOKEN'],'id'=>$_SERVER['HTTP_UID']];
-	}else  return ['id'=>0,'token'=>''];
 }
 class MyException extends Exception {
 	const INPUT_ERR=400;
