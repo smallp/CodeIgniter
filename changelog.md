@@ -26,3 +26,10 @@
 Eg. throw new MyException('',MyException::DATABASE);前面为字符串，表示错误信息，有默认值。后面为错误类型，详见/system/core/common。
 * input类中，参数添加默认值。  
 Eg. get($index = NULL, $xss_clean = FALSE,$default=NULL)，其他方法同。
+* 所有的数据库操作都会记录在日志中，错误日志与普通日志分开存储。
+* 内置log类添加开关，可以通过
+```
+		$log =& load_class('Log', 'core');
+		$log->setDisable(false);
+```
+来开关。

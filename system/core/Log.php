@@ -189,4 +189,9 @@ class CI_Log {
 
 		return error_log($level.' - '.$date.' --> '.$msg."\n",3,$filepath);
 	}
+
+	function setDisable($disable=false)
+	{
+		$this->_enabled =$disable;
+	}
 }
