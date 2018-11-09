@@ -26,9 +26,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config['base_url'] = '';
 
 /*
-|--------------------------------------------------------------------------
-| Base Site URL
-|--------------------------------------------------------------------------
 |
 |Whether CI uses restful design model.
 |
